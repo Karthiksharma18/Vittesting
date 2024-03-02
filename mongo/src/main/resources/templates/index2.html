@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Blood Bank Search</title>
+</head>
+<body>
+<h1>Search for Blood Banks Nearby</h1>
+<div>
+    <label for="location">Enter Your Location:</label>
+    <input type="text" id="location" name="location">
+    <button onclick="searchBloodBanks()">Search</button>
+</div>
+<div id="searchResults"></div>
+
+<script>
+    function searchBloodBanks() {
+        var location = document.getElementById("location").value;
+        var xhr = new XMLHttpRequest();
+        xhr.open("GET", "/bloodbanks/search?location=" + location, true);
+        xhr.onreadystatechange = function () {
+            if (xhr.readyState == 4 && xhr.status == 200) {
+                var response = JSON.parse(xhr.responseText);
+                displaySearchResults(response);
+            }
+        };
+        xhr.send();
+    }
+
+    function displaySearchResults(results) {
+        var searchResultsDiv = document.getElementById("searchResults");
+        searchResultsDiv.innerHTML = ""; // Clear previous results
+        if (results.length === 0) {
+            searchResultsDiv.innerHTML = "<p>No blood banks found nearby.</p>";
+        } else {
+            var html = "<h2>Search Results</h2>";
+            html += "<ul>";
+            results.forEach(function (bloodBank) {
+                html += "<li><strong>Name:</strong> " + bloodBank.name + "<br><strong>Address:</strong> " + bloodBank.address + "</li>";
+            });
+            html += "</ul>";
+            searchResultsDiv.innerHTML = html;
+        }
+    }
+</script>
+</body>
+</html>
