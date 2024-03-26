@@ -38,16 +38,21 @@ public class ProductController {
     @PostMapping("/submit-blood-group")
     public ResponseEntity<String> submitBloodGroup(@RequestBody String bloodGroup) {
         // Save the blood group to the database
-        System.out.println(bloodGroup);
-        try {
+        Product existingProduct = productRepository.findByDescription(bloodGroup);
+        if(existingProduct != null) {
+            // If the blood group already exists, increment the count
+            existingProduct.setCount(existingProduct.getCount() + 1);
+            productRepository.save(existingProduct);
+        }else {
+            // If the blood group does not exist, create a new product
             Product product = new Product();
             product.setName("Blood Group");
             product.setDescription(bloodGroup);
+            product.setCount(1);
             productRepository.save(product);
-            return ResponseEntity.ok("Blood group submitted successfully!");
-        } catch (Exception e) {
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Error submitting blood group: " + e.getMessage());
         }
+        return ResponseEntity.ok("Blood group submitted successfully!");
+
     }
 
 }
